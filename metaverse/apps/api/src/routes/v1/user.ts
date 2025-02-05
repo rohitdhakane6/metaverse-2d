@@ -1,30 +1,52 @@
 import { Router } from "express";
-import db from "@repo/db"
-import { userSignupSchema } from "../../validations";
+import { UpdateMetadataSchema } from "../../validations";
+import db from "@repo/db";
+import { userMiddleware } from "../../middlewares/user";
 
-const userRoutes: Router = Router();
-userRoutes.post("/signup", async(req, res) => {
+export const userRouter:Router = Router();
+
+userRouter.post("/metadata", userMiddleware, async (req, res) => {
+    const parsedData = UpdateMetadataSchema.safeParse(req.body)       
+    if (!parsedData.success) {
+        console.log("parsed data incorrect")
+        res.status(400).json({message: "Validation failed"})
+        return
+    }
     try {
-        const parsedData        =userSignupSchema.safeParse(req.body);
-        if(!parsedData.success){
-            res.status(400).json({error:parsedData.error});
-            return;
-        }
-        const hashedPassword=await bcrypt.hash(parsedData.data.password,10);
-        const user=await db.user.create({
-            data:{
-                username:parsedData.data.username,
-                password:hashedPassword,
+        await db.user.update({
+            where: {
+                id: req.userId
+            },
+            data: {
+                avatarId: parsedData.data.avatarId
             }
         })
-    } catch (error) {
-        
+        res.json({message: "Metadata updated"})
+    } catch(e) {
+        console.log("error")
+        res.status(400).json({message: "Internal server error"})
     }
-  
-    
-});
-userRoutes.post("/signin", (req, res) => {
-  res.json({ message: "Sign in route" });
-});
+})
 
-export default userRoutes;
+userRouter.get("/metadata/bulk", async (req, res) => {
+    const userIdString = (req.query.ids ?? "[]") as string;
+    const userIds = (userIdString).slice(1, userIdString?.length - 1).split(",");
+    console.log(userIds)
+    const metadata = await db.user.findMany({
+        where: {
+            id: {
+                in: userIds
+            }
+        }, select: {
+            avatar: true,
+            id: true
+        }
+    })
+
+    res.json({
+        avatars: metadata.map(m => ({
+            userId: m.id,
+            avatarId: m.avatar?.imageUrl
+        }))
+    })
+})

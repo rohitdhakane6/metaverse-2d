@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import { json, urlencoded } from "body-parser";
 import morgan from "morgan";
 import cors from "cors";
@@ -18,7 +18,7 @@ app
 
 app.use("/api/v1", routes);
 
-app.use((req: Request, res: Response) => {
+app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
