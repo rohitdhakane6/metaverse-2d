@@ -10,10 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
     "@repo/design-system": "workspace:*",
-    "@repo/tailwind-config": "workspace:*"
+    "@repo/tailwind-config": "workspace:*",
+    "@vitejs/plugin-react": "^4.3.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
