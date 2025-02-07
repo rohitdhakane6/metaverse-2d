@@ -1,0 +1,24 @@
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@repo/design-system/components/ui/dropdown-menu";
+import { Button } from "@repo/design-system/components/ui/button";
+import {User, LogOut } from "lucide-react";
+
+export default function ProfileDropdown() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="flex items-center space-x-1 ">
+          <User size={20} />
+          <samp>Rohit Dhakane</samp>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-full">
+        <DropdownMenuItem onClick={() => console.log("Profile clicked")}>
+          <User size={16} className="mr-2" /> Profile
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => console.log("Logout clicked")} className="text-red-500 focus:text-red-500" >
+          <LogOut size={16} className="mr-2" /> Logout
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
