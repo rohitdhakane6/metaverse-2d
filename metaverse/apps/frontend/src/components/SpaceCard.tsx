@@ -1,4 +1,4 @@
-import { MoreVertical, Users} from "lucide-react";
+import { MoreVertical, Users } from "lucide-react";
 import { cn } from "@repo/design-system/lib/utils";
 
 interface SpaceCardProps {
@@ -16,7 +16,8 @@ export function SpaceCard({
 }: SpaceCardProps) {
   return (
     <div className={cn("group", className)}>
-      <div className="relative">
+      <a href={`/space/${title}`}>
+      <div className="relative cursor-pointer ">
         <div className="aspect-video rounded-lg overflow-hidden">
           <img
             src={image}
@@ -43,6 +44,7 @@ export function SpaceCard({
           <MoreVertical className="w-5 h-5 text-white" />
         </button>
       </div>
+      </a>
 
       {/* Information below image */}
       <div className="mt-3">

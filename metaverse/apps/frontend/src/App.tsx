@@ -24,7 +24,7 @@ const App = () => {
           {/* Protected route that requires authentication */}
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/dashboard/:spaceId" element={<Space />} />
+            <Route path="/space/:spaceName" element={<Space />} />
           </Route>
 
           {/* Catch-all: Redirect unknown routes to home */}
