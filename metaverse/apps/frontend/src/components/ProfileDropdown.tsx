@@ -1,8 +1,18 @@
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@repo/design-system/components/ui/dropdown-menu";
 import { Button } from "@repo/design-system/components/ui/button";
 import {User, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function ProfileDropdown() {
+  const navigate = useNavigate();
+
+  const handelLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  }
+  
+
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -15,7 +25,7 @@ export default function ProfileDropdown() {
         <DropdownMenuItem onClick={() => console.log("Profile clicked")}>
           <User size={16} className="mr-2" /> Profile
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => console.log("Logout clicked")} className="text-red-500 focus:text-red-500" >
+        <DropdownMenuItem onClick={handelLogout} className="text-red-500 focus:text-red-500" >
           <LogOut size={16} className="mr-2" /> Logout
         </DropdownMenuItem>
       </DropdownMenuContent>
