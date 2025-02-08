@@ -23,9 +23,9 @@ router.post("/signup", async (req, res) => {
   try {
     const user = await db.user.create({
       data: {
-        username: parsedData.data.username,
+        username: parsedData.data.email,
         password: hashedPassword,
-        role: parsedData.data.type === "admin" ? "Admin" : "User",
+        role: parsedData.data.role === "admin" ? "Admin" : "User",
       },
     });
     res.json({
@@ -48,7 +48,7 @@ router.post("/signin", async (req, res) => {
   try {
     const user = await db.user.findUnique({
       where: {
-        username: parsedData.data.username,
+        username: parsedData.data.email,
       },
     });
 
