@@ -13,6 +13,7 @@
   "description": "",
   "dependencies": {
     "@repo/db": "workspace:*",
+    "@repo/common": "workspace:*",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/ws": "^8.5.12",
     "esbuild": "^0.24.0",
