@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { UpdateMetadataSchema } from "../../validations";
+import { UpdateMetadataSchema } from "@repo/common";
 import db from "@repo/db";
 import { userMiddleware } from "../../middlewares/user";
 

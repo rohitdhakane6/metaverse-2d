@@ -1,6 +1,6 @@
 import { Router } from "express";
 import db from "@repo/db"
-import { AddElementSchema, CreateAvatarSchema, CreateElementSchema, CreateMapSchema, UpdateElementSchema } from "../../validations";
+import { AddElementSchema, CreateAvatarSchema, CreateElementSchema, CreateMapSchema, UpdateElementSchema } from "@repo/common";
 import { adminMiddleware } from "../../middlewares/admin";
 
 export const adminRouter:Router = Router();

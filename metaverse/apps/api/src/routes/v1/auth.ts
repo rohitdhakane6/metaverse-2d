@@ -2,7 +2,7 @@ import { Router } from "express";
 import jwt from "jsonwebtoken";
 import db from "@repo/db";
 
-import { SigninSchema, SignupSchema } from "../../validations";
+import { SigninSchema, SignupSchema } from "@repo/common";
 import { compare, hash } from "../../config/scrypt";
 import { JWT_PASSWORD } from "../../config";
 
