@@ -7,7 +7,9 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "studio": "prisma studio"
+    
+
   },
   "keywords": [],
   "author": "",
