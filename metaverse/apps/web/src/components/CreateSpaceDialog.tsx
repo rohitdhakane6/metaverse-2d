@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,48 +11,79 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
-
-// Zod Schema for validation
-const spaceSchema = z.object({
-  spaceName: z
-    .string()
-    .min(3, "Space name must be at least 3 characters long")
-    .max(20, "Space name cannot exceed 20 characters")
-    .regex(/^[a-zA-Z0-9-_]+$/, "Only letters, numbers, hyphens, and underscores are allowed"),
-});
+import { toast } from "sonner";
+import { CreateSpaceSchema } from "@repo/common";
+import axiosInstance from "@/util/axiosInstance";
+import { useSpace } from "@/hooks/useSpace";
 
 export default function CreateSpaceDialog() {
-  const [formData, setFormData] = useState({ spaceName: "" });
+  const { refetch } = useSpace();
+  const [formData, setFormData] = useState({
+    name: "",
+    dimensions: "200x200",
+  });
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [open, setOpen] = useState(false); // Manage dialog open state
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ spaceName: e.target.value });
+    setFormData((prev) => ({
+      ...prev,
+      name: e.target.value,
+    }));
     setError(null); // Clear error when user starts typing
   };
 
-  const handleSubmit = () => {
-    const validationResult = spaceSchema.safeParse(formData);
-    
-    if (!validationResult.success) {
-      setError(validationResult.error.errors[0].message);
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    const parsedData = CreateSpaceSchema.safeParse(formData);
+
+    if (!parsedData.success) {
+      setError(parsedData.error.errors[0].message);
+      setIsSubmitting(false);
       return;
     }
 
-    console.log("Space Created:", formData);
+    try {
+      axiosInstance.post("/space", parsedData.data);
+      toast.success("Space created successfully");
+      setOpen(false);
+      refetch();
+      location.reload();
+      // TODO: Remove location.reload() and replace with a better solution
+      //eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      toast.error("Failed to create space");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Submit on Enter key press
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSubmit();
+    }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       {/* Trigger Button */}
       <DialogTrigger asChild>
-        <Button className="bg-[#10B981] hover:bg-[#059669] px-5 py-3 rounded-lg flex items-center gap-2 text-white font-medium">
+        <Button
+          onClick={() => setOpen(true)} // Open the dialog
+          className="bg-[#10B981] hover:bg-[#059669] px-5 py-3 rounded-lg flex items-center gap-2 text-white font-medium"
+        >
           <Plus className="w-5 h-5" />
           Create Space
         </Button>
       </DialogTrigger>
 
       {/* Dialog Content */}
-      <DialogContent className="max-w-md p-6 rounded-lg shadow-lg">
+      <DialogContent
+        className="max-w-md p-6 rounded-lg shadow-lg"
+        aria-describedby="Create a new office space"
+      >
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">
             Create a new office space for your team
@@ -63,16 +93,20 @@ export default function CreateSpaceDialog() {
         {/* Space Name */}
         <div className="flex flex-col gap-2">
           <Label htmlFor="spaceName" className="text-sm font-medium">
-            Space Name <span className="text-red-500">*</span> (Appears at the end of URL)
+            Space Name <span className="text-red-500">*</span> (Appears at the
+            end of URL)
           </Label>
           <Input
             id="spaceName"
             name="spaceName"
-            value={formData.spaceName}
+            value={formData.name}
             onChange={handleInputChange}
+            onKeyDown={handleKeyDown} // Handle Enter key press
             required
             className={`px-3 py-2 border rounded-md focus:ring-2 outline-none ${
-              error ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-[#10B981]"
+              error
+                ? "border-red-500 focus:ring-red-500"
+                : "border-gray-300 focus:ring-[#10B981]"
             }`}
           />
           {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -80,8 +114,12 @@ export default function CreateSpaceDialog() {
 
         {/* Dialog Footer */}
         <DialogFooter className="mt-4">
-          <Button onClick={handleSubmit} className="w-full bg-[#10B981] hover:bg-[#059669] py-2 text-white font-medium rounded-md">
-            Create Space
+          <Button
+            onClick={handleSubmit}
+            disabled={isSubmitting} // Disable button while submitting
+            className="w-full bg-[#10B981] hover:bg-[#059669] py-2 text-white font-medium rounded-md cursor-pointer"
+          >
+            {isSubmitting ? "Creating..." : "Create Space"}
           </Button>
         </DialogFooter>
       </DialogContent>

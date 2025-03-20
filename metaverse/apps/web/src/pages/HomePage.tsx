@@ -2,12 +2,12 @@ import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen">
       <div className="container mx-auto px-6 text-center">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <h1 className="text-4xl font-bold mb-4">
           Welcome to Our Platform
         </h1>
-        <p className="text-lg text-gray-600 mb-6">
+        <p className="text-lg  mb-6">
           Create and manage spaces effortlessly. Join us today!
         </p>
 

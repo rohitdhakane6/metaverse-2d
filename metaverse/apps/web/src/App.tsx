@@ -11,6 +11,7 @@ import Home from "./pages/HomePage";
 import Login from "./pages/Login";
 import Space from "./pages/Space";
 import { ProtectedRoute } from "./util/ProtectedRoute";
+import Register from "@/pages/Register";
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
           {/* Public routes that redirect logged-in users */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
           {/* Protected route that requires authentication */}
           <Route element={<ProtectedRoute />}>

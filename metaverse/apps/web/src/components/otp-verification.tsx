@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useToast } from '@hooks/use-toast';
-import { cn } from '@lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, CheckCircle2, Timer, Shield, KeyRound } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 interface OTPVerificationProps {
   onVerify: (otp: string) => Promise<boolean>;
@@ -27,8 +28,8 @@ export function OTPVerification({
   const [retryCount, setRetryCount] = useState(0);
   const [isVerified, setIsVerified] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(6).fill(null));
-  const timerRef = useRef<NodeJS.Timeout>();
-  const { toast } = useToast();
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const navigate = useNavigate();
 
   const handleChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
@@ -85,11 +86,11 @@ export function OTPVerification({
           const isValid = await onVerify(value);
           if (isValid) {
             setIsVerified(true);
-            toast({
-              title: 'Verification successful',
+            toast('Verification successful',{
               description: 'Your code has been verified.',
               duration: 3000,
             });
+            navigate('/dashboard');
           } else {
             setRetryCount((prev) => prev + 1);
             if (retryCount + 1 >= maxRetries) {
@@ -98,6 +99,7 @@ export function OTPVerification({
               setError('Invalid verification code. Please try again.');
             }
           }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
           setError('An error occurred during verification. Please try again.');
         } finally {
@@ -105,7 +107,7 @@ export function OTPVerification({
         }
       }
     },
-    [onVerify, retryCount, maxRetries, toast]
+    [onVerify, navigate, retryCount, maxRetries]
   );
 
   useEffect(() => {
@@ -132,12 +134,12 @@ export function OTPVerification({
       setOtp(Array(6).fill(''));
       setError(null);
       setRetryCount(0);
-      toast({
-        title: 'Code resent',
+      toast('Code resent',{
         description: 'A new verification code has been sent.',
         duration: 3000,
       });
       inputRefs.current[0]?.focus();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError('Failed to resend code. Please try again.');
     } finally {
@@ -176,7 +178,7 @@ export function OTPVerification({
                 {otp.map((digit, index) => (
                   <Input
                     key={index}
-                    ref={el => inputRefs.current[index] = el}
+                    ref={el => { inputRefs.current[index] = el; }}
                     type="text"
                     inputMode="numeric"
                     pattern="\d*"
