@@ -2,26 +2,28 @@ import { MoreVertical, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SpaceCardProps {
-  title: string;
+  name: string;
+  id: string;
   image: string;
   activeUsers?: number;
   className?: string;
 }
 
 export function SpaceCard({
-  title,
+  name,
+  id,
   image,
   activeUsers = 0,
   className,
 }: SpaceCardProps) {
   return (
     <div className={cn("group", className)}>
-      <a href={`/space/${title}`}>
+      <a href={`/space/${id}`}>
       <div className="relative cursor-pointer ">
         <div className="aspect-video rounded-lg overflow-hidden">
           <img
             src={image}
-            alt={title}
+            alt={name}
             className="w-full h-full object-cover transition-transform group-hover:scale-105"
           />
 
@@ -49,7 +51,7 @@ export function SpaceCard({
       {/* Information below image */}
       <div className="mt-3">
         <div className="flex items-center justify-between text-sm ">
-          <h3 className="text-white font-medium mb-2">{title}</h3>
+          <h3 className="text-white font-medium mb-2">{name}</h3>
           <div className="flex items-center space-x-4">
             <div className="flex items-center text-gray-300">
               <Users className="w-4 h-4 mr-1.5" />

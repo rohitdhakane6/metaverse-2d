@@ -1,27 +1,29 @@
-import  { useEffect, useState } from 'react';
-import { Game } from 'phaser';
-import { GameConfig } from '../game/config';
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { Game } from "phaser";
+import { GameConfig } from "@/game/config";
 
 const GameUI = () => {
-  const [isChatOpen, setIsChatOpen] = useState(true);
+  const { spaceId } = useParams<{ spaceId: string }>();
+
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { id: 1, text: "Welcome to the virtual office!", type: 'system' },
-    { id: 2, text: "Use WASD or arrow keys to move around.", type: 'system' }
+    { id: 1, text: "Welcome to the virtual office!", type: "system" },
+    { id: 2, text: "Use WASD or arrow keys to move around.", type: "system" },
   ]);
-  const [game, setGame] = useState(null);
 
   useEffect(() => {
     const gameInstance = new Game(GameConfig);
-    setGame(gameInstance);
+    localStorage.setItem("spaceId", spaceId!);
 
     const handleResize = () => {
       gameInstance.scale.resize(window.innerWidth, window.innerHeight);
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
       gameInstance.destroy(true);
     };
   }, []);
@@ -39,15 +41,25 @@ const GameUI = () => {
           <div className="text-sm bg-green-500 px-2 py-1 rounded">Online</div>
         </div>
         <div className="flex items-center space-x-4">
-          <button 
+          <button
             onClick={toggleChat}
             className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md transition-colors"
           >
-            {isChatOpen ? 'Hide Chat' : 'Show Chat'}
+            {isChatOpen ? "Hide Chat" : "Show Chat"}
           </button>
           <button className="bg-gray-700 hover:bg-gray-600 p-2 rounded-full">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              />
             </svg>
           </button>
         </div>
@@ -70,13 +82,13 @@ const GameUI = () => {
 
             {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map(message => (
+              {messages.map((message) => (
                 <div
                   key={message.id}
                   className={`p-3 rounded-lg ${
-                    message.type === 'system' 
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-700 text-white'
+                    message.type === "system"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-700 text-white"
                   }`}
                 >
                   {message.text}
@@ -124,7 +136,7 @@ const GameUI = () => {
             <kbd className="px-2 py-1 bg-gray-700 rounded">→</kbd>
           </div>
         </div>
-        
+
         <div className="flex items-center space-x-3">
           <button className="p-2 hover:bg-gray-700 rounded-full transition-colors">
             <span className="text-xl">🔊</span>

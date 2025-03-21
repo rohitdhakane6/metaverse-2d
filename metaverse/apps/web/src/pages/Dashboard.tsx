@@ -48,7 +48,8 @@ const Dashboard = () => {
             {spaces.map((space) => (
               <SpaceCard
                 key={space.id}
-                title={space.name}
+                id={space.id}
+                name={space.name}
                 image={space.thumbnail}
                 activeUsers={0}
               />
