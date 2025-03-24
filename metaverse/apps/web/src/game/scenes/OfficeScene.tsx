@@ -1,8 +1,8 @@
 import { Scene } from "phaser";
 
 export class OfficeScene extends Scene {
-  private character!: Phaser.GameObjects.Arc; // Define the character as a green dot
-  private cursors!: Phaser.Types.Input.Keyboard.CursorKeys; // Add cursors for keyboard input
+  private character!: Phaser.GameObjects.Arc;
+  private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private keys!: {
     W: Phaser.Input.Keyboard.Key;
     A: Phaser.Input.Keyboard.Key;
@@ -13,6 +13,8 @@ export class OfficeScene extends Scene {
   private users: Map<string, { x: number; y: number }> = new Map();
   private userCircles: Map<string, Phaser.GameObjects.Arc> = new Map();
   private ws!: WebSocket;
+  private spaceId = localStorage.getItem("spaceId");
+  private authToken = localStorage.getItem("token");
 
   constructor() {
     super({ key: "OfficeScene" });
@@ -69,8 +71,8 @@ export class OfficeScene extends Scene {
         JSON.stringify({
           type: "join",
           payload: {
-            token: localStorage.getItem("token"),
-            spaceId: localStorage.getItem("spaceId"),
+            token: this.authToken,
+            spaceId: this.spaceId,
           },
         })
       );
