@@ -12,6 +12,7 @@ import Login from "./pages/Login";
 import Space from "./pages/Space";
 import { ProtectedRoute } from "./util/ProtectedRoute";
 import Register from "@/pages/Register";
+import {Sfu} from "@/pages/Sfu";
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/space/:spaceId" element={<Space />} />
+            <Route path="/sfu" element={<Sfu/>}/>
           </Route>
 
           {/* Catch-all: Redirect unknown routes to home */}

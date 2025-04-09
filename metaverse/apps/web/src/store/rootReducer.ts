@@ -1,7 +1,9 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import arenaSlice from "./slices/arenaSlice"
+import arenaSlice from "./slices/arenaSlice";
+import mediaDevicesSlice from "./slices/mediaDevicesSlice";
 const rootReducer = combineReducers({
-  arena:arenaSlice
+  arena: arenaSlice,
+  mediaDevices: mediaDevicesSlice,
 });
 
 export default rootReducer;
