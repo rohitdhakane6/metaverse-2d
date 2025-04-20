@@ -15,14 +15,14 @@ export default function Toolbar() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
 
-  const stream = useTypedSelector((state) => state.mediaDevices.activeStream);
+  const stream = useTypedSelector((state) => state.mediaDevices.tracks.camera);
   const isVideoEnabled = useTypedSelector(
-    (state) => state.mediaDevices.isVideoEnabled
+    (state) => state.mediaDevices.enabled.camera
   );
 
   useEffect(() => {
     if (videoRef.current && stream && isVideoEnabled) {
-      videoRef.current.srcObject = stream;
+      videoRef.current.srcObject = new MediaStream([stream]);
       videoRef.current
         .play()
         .catch((err) => console.error("Video play error:", err));
