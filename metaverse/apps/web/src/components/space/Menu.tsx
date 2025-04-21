@@ -11,7 +11,7 @@ import {
 import { useTypedSelector } from "@/hooks/useTypedSelector";
 import { Users, LogOut, Edit3 } from "lucide-react";
 
-export default function Toolbar() {
+export default function Menu() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
 

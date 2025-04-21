@@ -9,11 +9,19 @@ import { useTypedSelector } from "@/hooks/useTypedSelector";
 import { io } from "socket.io-client";
 import * as mediasoupClient from "mediasoup-client";
 import { SFURoomClient, MediaType, RoomEvents } from "@/lib/sfuRoomClient";
-import { Button } from "@/components/ui/button";
 
 const Space = () => {
   const { spaceId } = useParams<{ spaceId: string }>();
   const isGameInFocus = useTypedSelector((state) => state.arena.isGameInFocus);
+  const iscameraEnabled = useTypedSelector(
+    (state) => state.mediaDevices.enabled.camera
+  );
+  const isMicrophoneEnabled = useTypedSelector(
+    (state) => state.mediaDevices.enabled.microphone
+  );
+  const isScreenShareEnabled = useTypedSelector(
+    (state) => state.mediaDevices.enabled.screen
+  );
 
   const gameInstanceRef = useRef<Game | null>(null);
   const localMediaRef = useRef<HTMLDivElement>(null);
@@ -94,7 +102,30 @@ const Space = () => {
   const handleStartAudio = () => roomClient?.produce(MediaType.Audio);
   const handleStopAudio = () => roomClient?.closeProducer(MediaType.Audio);
   const handleStartScreenShare = () => roomClient?.produce(MediaType.Screen);
-  const handleStopScreenShare = () => roomClient?.closeProducer(MediaType.Screen);
+  const handleStopScreenShare = () =>
+    roomClient?.closeProducer(MediaType.Screen);
+
+  useEffect(() => {
+    if (roomClient) {
+      if (iscameraEnabled) {
+        handleStartVideo();
+      } else {
+        handleStopVideo();
+      }
+
+      if (isMicrophoneEnabled) {
+        handleStartAudio();
+      } else {
+        handleStopAudio();
+      }
+
+      if (isScreenShareEnabled) {
+        handleStartScreenShare();
+      } else {
+        handleStopScreenShare();
+      }
+    }
+  }, [roomClient, iscameraEnabled, isMicrophoneEnabled, isScreenShareEnabled]);
 
   return (
     <div className="h-screen w-screen flex flex-col relative overflow-hidden">
@@ -109,21 +140,11 @@ const Space = () => {
           <div id="game-container" className="w-full h-full" />
         </Card>
 
-        {/* Floating SFU Controls */}
-        <div className="absolute bottom-4 left-4 z-20 bg-background/80 backdrop-blur-md rounded-xl p-4 shadow-lg space-y-2">
-          <div className="flex flex-wrap gap-2 justify-center">
-            <Button size="sm" onClick={handleStartVideo}>🎥 Start Video</Button>
-            <Button size="sm" onClick={handleStopVideo}>⛔ Stop Video</Button>
-            <Button size="sm" onClick={handleStartAudio}>🎙 Start Audio</Button>
-            <Button size="sm" onClick={handleStopAudio}>🔇 Stop Audio</Button>
-            <Button size="sm" onClick={handleStartScreenShare}>🖥 Share Screen</Button>
-            <Button size="sm" onClick={handleStopScreenShare}>🛑 Stop Screen</Button>
-          </div>
-        </div>
-
         {/* Local/Remote Media Grid */}
         <div className="absolute top-20 right-4 z-20 bg-background/80 backdrop-blur-md rounded-xl p-3 shadow max-h-[80vh] w-[300px] overflow-y-auto">
-          <h3 className="text-sm font-semibold text-center mb-2">Participants</h3>
+          <h3 className="text-sm font-semibold text-center mb-2">
+            Participants
+          </h3>
           <div ref={localMediaRef} className="mb-4 space-y-2">
             <p className="text-xs text-muted-foreground">Local Media</p>
           </div>
