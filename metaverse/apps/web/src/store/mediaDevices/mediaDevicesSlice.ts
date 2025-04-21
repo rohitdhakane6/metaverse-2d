@@ -121,6 +121,8 @@ const mediaDevicesSlice = createSlice({
         state.tracks[type] = null;
       }
     },
+    // TODO:If the selected device changes, update the track as well
+
     selectDevice: (
       state,
       action: PayloadAction<{
