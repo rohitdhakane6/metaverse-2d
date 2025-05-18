@@ -36,10 +36,12 @@ spaceRouter.post("/", userMiddleware, async (req, res) => {
             })(),
         },
       });
-      res.json({ id: space.id,
+      res.json({
+        id: space.id,
         name: space.name,
         thumbnail: space.thumbnail,
-        dimensions: `${space.width}x${space.height}`, });
+        dimensions: `${space.width}x${space.height}`,
+      });
       return;
     }
 
@@ -150,32 +152,31 @@ spaceRouter.delete("/:spaceId", userMiddleware, async (req, res) => {
 });
 
 spaceRouter.get("/all", userMiddleware, async (req, res) => {
-  // const spaces = await db.space.findMany({
-  //   where: { creatorId: req.userId },
-  // });
-  const spaces = await db.userSpace.findMany({
-    where: { userId: req.userId },
-    include: { space: true },
+  const spaces = await db.space.findMany({
+    where: { creatorId: req.userId },
   });
+
+  // const spaces = await db.userSpace.findMany({
+  //   where: { userId: req.userId },
+  //   include: { space: true },
+  // });
+  // res.json({
+  //   spaces: spaces.map((s) => ({
+  //     id: s.space.id,
+  //     name: s.space.name,
+  //     thumbnail: s.space.thumbnail,
+  //     dimensions: `${s.space.width}x${s.space.height}`,
+  //   })),
+  // });
 
   res.json({
     spaces: spaces.map((s) => ({
-      id: s.space.id,
-      name: s.space.name,
-      thumbnail: s.space.thumbnail,
-      dimensions: `${s.space.width}x${s.space.height}`,
+      id: s.id,
+      name: s.name,
+      thumbnail: s.thumbnail,
+      dimensions: `${s.width}x${s.height}`,
     })),
   });
-  
-
-  // res.json({
-  //   spaces: spaces.map((s) => ({
-  //     id: s.id,
-  //     name: s.name,
-  //     thumbnail: s.thumbnail,
-  //     dimensions: `${s.width}x${s.height}`,
-  //   })),
-  // });
 });
 
 spaceRouter.post("/element", userMiddleware, async (req, res) => {
