@@ -49,7 +49,7 @@ export default function CreateSpaceDialog() {
       toast.success("Space created successfully");
       setOpen(false);
       refetch();
-      location.reload();
+      // location.reload();
       // TODO: Remove location.reload() and replace with a better solution
       //eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {

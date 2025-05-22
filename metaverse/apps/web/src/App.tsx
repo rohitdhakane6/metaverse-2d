@@ -9,7 +9,7 @@ import { ThemeProvider } from "./components/theme-provider";
 import Dashboard from "./pages/Dashboard";
 import Home from "./pages/HomePage";
 import Login from "./pages/Login";
-import Space from "./pages/Space";
+import Space from "./pages/SpacePage";
 import { ProtectedRoute } from "./util/ProtectedRoute";
 import Register from "@/pages/Register";
 import {Sfu} from "@/pages/Sfu";

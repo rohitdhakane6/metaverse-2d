@@ -1,171 +1,120 @@
-import type { WebSocket } from "ws";
+import { Socket } from "socket.io";
 import { RoomManager } from "./RoomManager";
-import type { OutgoingMessage } from "./types";
 import db from "@repo/db";
 import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
 import { JWT_PASSWORD } from "./config";
-export class User {
-  public userId?: string;
-  private spaceId?: string;
-  private height?: number;
-  private width?: number;
-  private x: number;
-  private y: number;
-  private ws: WebSocket;
+import {
+  SocketEvent,
+  RoomJoinPayload,
+  PlayerUpdatePayload,
+  Player,
+} from "@repo/common/game";
 
-  constructor(ws: WebSocket) {
-    this.x = 0;
-    this.y = 0;
-    this.ws = ws;
+export class User {
+  public userId!: string;
+  public userName!: string;
+  public roomId?: string;
+  public position!: { x: number; y: number };
+  public avatar!: string;
+  public anim!: string;
+  private socket: Socket;
+
+  constructor(socket: Socket) {
+    this.socket = socket;
     this.initHandlers();
   }
 
-  initHandlers() {
-    this.ws.on("message", async (data) => {
-      try {
-        const parsedData = JSON.parse(data.toString());
-        switch (parsedData.type) {
-          case "join":
-            const token = parsedData.payload.token;
-            const spaceId = parsedData.payload.spaceId;
-            if (!token || !spaceId) {
-              console.log("spaceId or token not provided");
-              this.ws.close();
-              return;
-            }
-            this.join(spaceId, token);
-            break;
-          case "move":
-            const moveX = parsedData.payload.x;
-            const moveY = parsedData.payload.y;
-            this.move(moveX, moveY);
-            break;
-        }
-      } catch (e) {
-        console.log(e);
+  private initHandlers() {
+    this.socket.on(SocketEvent.RoomJoin, (payload: RoomJoinPayload) => {
+      this.joinRoom(payload);
+    });
+
+    this.socket.on(SocketEvent.PlayerUpdate, (payload: PlayerUpdatePayload) => {
+      this.handlePlayerUpdate(payload);
+    });
+  }
+
+  private async joinRoom(payload: RoomJoinPayload) {
+    try {
+      const { roomId, authToken, user } = payload;
+
+      const decoded = jwt.verify(authToken, JWT_PASSWORD) as JwtPayload;
+      this.userId = decoded.userId;
+      this.userName = user.username;
+      this.position = user.position;
+      this.avatar = user.avatar;
+      this.anim = user.anim;
+      this.roomId = roomId;
+
+      if (!this.userId) {
+        throw new Error("Invalid User credentials");
       }
-    });
-  }
 
-  async join(spaceId: string, token: string) {
-    const userId = (jwt.verify(token, JWT_PASSWORD) as JwtPayload).userId;
-    if (!userId) {
-      this.ws.close();
-      return;
-    }
-    this.userId = userId;
-    const space = await db.space.findFirst({
-      where: {
-        id: spaceId,
-      },
-    });
-    if (!space) {
-      this.ws.close();
-      return;
-    }
-    this.spaceId = space.id;
-    this.height = space.height;
-    this.width = space.width;
+      const room = await db.space.findUnique({ where: { id: roomId } });
+      if (!room) {
+        throw new Error("Game space not found");
+      }
 
-    RoomManager.getInstance().addUser(spaceId, this);
+      RoomManager.getInstance().addUser(roomId, this);
 
-    this.x = Math.floor(Math.random() * space?.width);
-    this.y = Math.floor(Math.random() * space?.height);
-    this.send({
-      type: "space-joined",
-      payload: {
-        spawn: {
-          x: this.x,
-          y: this.y,
-        },
-        users:
-          RoomManager.getInstance()
-            .rooms.get(spaceId)
-            ?.filter((x) => x.userId !== this.userId)
-            ?.map((u) => ({ userId: u.userId, x: u.x, y: u.y })) ?? [],
-      },
-    });
-    RoomManager.getInstance().broadcast(
-      {
-        type: "user-joined",
-        payload: {
-          userId: this.userId,
-          x: this.x,
-          y: this.y,
-        },
-      },
-      this,
-      this.spaceId ?? ""
-    );
-  }
-
-  async move(moveX: number, moveY: number) {
-    const xDisplacement = Math.abs(this.x - moveX);
-    const yDisplacement = Math.abs(this.y - moveY);
-
-    const isWithinBounds =
-      moveX > 0 &&
-      moveY > 0 &&
-      moveX < (this.width ?? 0) &&
-      moveY < (this.height ?? 0);
-    const isValidHorizontalMove = xDisplacement === 1 && yDisplacement === 0;
-    const isValidVerticalMove = xDisplacement === 0 && yDisplacement === 1;
-
-    const isValidMove =
-      isWithinBounds && (isValidHorizontalMove || isValidVerticalMove);
-
-    if (isValidMove) {
-      this.x = moveX;
-      this.y = moveY;
-
-      this.send({
-        type: "move",
-        payload: {
-          x: this.x,
-          y: this.y,
-        },
+      // Send current room state to new player
+      this.send(SocketEvent.RoomSync, {
+        players: this.getOtherPlayers(),
       });
 
-      RoomManager.getInstance().broadcast(
-        {
-          type: "movement",
-          payload: {
-            userId: this.userId,
-            x: this.x,
-            y: this.y,
-          },
-        },
-        this,
-        this.spaceId ?? ""
+      // Broadcast new player to others
+      RoomManager.getInstance().broadcastToRoom(
+        SocketEvent.PlayerJoined,
+        this.serialize(),
+        this
       );
-    } else {
-      // TODO: Fix issue with movement rejection being sent every time
-      this.send({
-        type: "movement-rejected",
-        payload: {
-          x: this.x,
-          y: this.y,
-        },
-      });
+    } catch (error: any) {
+      console.log(error);
     }
   }
 
-  destroy() {
-    RoomManager.getInstance().broadcast(
-      {
-        type: "user-left",
-        payload: {
-          userId: this.userId,
-        },
-      },
-      this,
-      this.spaceId ?? ""
+  private handlePlayerUpdate(payload: PlayerUpdatePayload) {
+    this.position = payload.position;
+    this.anim = payload.anim;
+
+    RoomManager.getInstance().broadcastToRoom(
+      SocketEvent.PlayerUpdated,
+      this.serialize(),
+      this
     );
-    RoomManager.getInstance().removeUser(this, this.spaceId ?? "");
   }
 
-  send(payload: OutgoingMessage) {
-    this.ws.send(JSON.stringify(payload));
+  public handleDisconnect() {
+    if (this.roomId) {
+      const roomManager = RoomManager.getInstance();
+      roomManager.removeUser(this, this.roomId);
+      roomManager.broadcastToRoom(SocketEvent.PlayerLeft, this.userId, this);
+    }
+
+    this.socket.disconnect();
+  }
+
+  public send(event: SocketEvent, payload: any) {
+    this.socket.emit(event, payload);
+  }
+
+  private getOtherPlayers(): Player[] {
+    const room = RoomManager.getInstance().rooms.get(this.roomId ?? "");
+    if (!room) return [];
+
+    return room
+      .filter((u) => u.userId !== this.userId)
+      .map((u) => u.serialize());
+  }
+
+  public serialize(): Player {
+    return {
+      userId: this.userId,
+      username: this.userName,
+      avatar: this.avatar,
+      position: this.position,
+      anim: this.anim,
+    };
   }
 }

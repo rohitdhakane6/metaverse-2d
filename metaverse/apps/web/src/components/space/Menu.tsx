@@ -14,7 +14,6 @@ import { Users, LogOut, Edit3 } from "lucide-react";
 export default function Menu() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
-
   const stream = useTypedSelector((state) => state.mediaDevices.tracks.camera);
   const isVideoEnabled = useTypedSelector(
     (state) => state.mediaDevices.enabled.camera
@@ -54,7 +53,7 @@ export default function Menu() {
           <span className="text-xs text-muted-foreground">Available</span>
         </div>
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button
               variant="ghost"
               size="icon"
@@ -78,7 +77,7 @@ export default function Menu() {
         <Messages />
 
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button variant="outline" size="icon">
               <Users />
             </Button>
@@ -87,7 +86,7 @@ export default function Menu() {
         </Tooltip>
 
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button variant="outline" size="icon">
               <LogOut />
             </Button>
