@@ -16,7 +16,6 @@ import PlayerSelector from "../characters/PlayerSelector";
 import { PlayerBehavior } from "../types/PlayerBehavior";
 import { NavKeys, Keyboard } from "../types/KeyboardState";
 import { GameClient } from "@/game/services/Network";
-import { ItemType } from "@/game/types/Items";
 import { Player, PlayerUpdatePayload } from "@repo/common/game";
 
 export default class Game extends Phaser.Scene {
@@ -199,7 +198,7 @@ export default class Game extends Phaser.Scene {
     const vendingMachineLayer = this.map.getObjectLayer("VendingMachine");
     if (!vendingMachineLayer)
       throw new Error("Layer 'VendingMachine' not found in the tilemap.");
-    vendingMachineLayer.objects.forEach((obj, i) => {
+    vendingMachineLayer.objects.forEach((obj) => {
       this.addObjectFromTiled(
         vendingMachines,
         obj,
@@ -280,7 +279,7 @@ export default class Game extends Phaser.Scene {
    * Handle overlap between player selector zone and items (chairs, computers, whiteboards, vending machines).
    * Manages selection change and dialog box display.
    */
-  private handleItemSelectorOverlap(playerSelector, selectionItem) {
+  private handleItemSelectorOverlap(playerSelector :any, selectionItem:any) {
     const currentItem = playerSelector.selectedItem as Item;
 
     // If previously selected item exists
@@ -408,55 +407,55 @@ export default class Game extends Phaser.Scene {
     const otherPlayer = this.otherPlayerMap.get(payload.userId);
     otherPlayer?.updateOtherPlayer(payload);
   }
-  private handlePlayersOverlap(myPlayer, otherPlayer) {
+  private handlePlayersOverlap(_myPlayer: any, _otherPlayer: any) {
     // otherPlayer.makeCall()
     // TODO: implement call logic
   }
-  private handleItemUserAdded(
-    playerId: string,
-    itemId: string,
-    itemType: ItemType
-  ) {
-    if (itemType === ItemType.COMPUTER) {
-      const computer = this.computerMap.get(itemId);
-      computer?.addCurrentUser(playerId);
-    } else if (itemType === ItemType.WHITEBOARD) {
-      const whiteboard = this.whiteboardMap.get(itemId);
-      whiteboard?.addCurrentUser(playerId);
-    }
-  }
+  // private handleItemUserAdded(
+  //   playerId: string,
+  //   itemId: string,
+  //   itemType: ItemType
+  // ) {
+  //   if (itemType === ItemType.COMPUTER) {
+  //     const computer = this.computerMap.get(itemId);
+  //     computer?.addCurrentUser(playerId);
+  //   } else if (itemType === ItemType.WHITEBOARD) {
+  //     const whiteboard = this.whiteboardMap.get(itemId);
+  //     whiteboard?.addCurrentUser(playerId);
+  //   }
+  // }
 
-  private handleItemUserRemoved(
-    playerId: string,
-    itemId: string,
-    itemType: ItemType
-  ) {
-    if (itemType === ItemType.COMPUTER) {
-      const computer = this.computerMap.get(itemId);
-      computer?.removeCurrentUser(playerId);
-    } else if (itemType === ItemType.WHITEBOARD) {
-      const whiteboard = this.whiteboardMap.get(itemId);
-      whiteboard?.removeCurrentUser(playerId);
-    }
-  }
+  // private handleItemUserRemoved(
+  //   playerId: string,
+  //   itemId: string,
+  //   itemType: ItemType
+  // ) {
+  //   if (itemType === ItemType.COMPUTER) {
+  //     const computer = this.computerMap.get(itemId);
+  //     computer?.removeCurrentUser(playerId);
+  //   } else if (itemType === ItemType.WHITEBOARD) {
+  //     const whiteboard = this.whiteboardMap.get(itemId);
+  //     whiteboard?.removeCurrentUser(playerId);
+  //   }
+  // }
 
-  private handleChatMessageAdded(playerId: string, content: string) {
-    const otherPlayer = this.otherPlayerMap.get(playerId);
-    otherPlayer?.updateDialogBubble(content);
-  }
-  private handleMyPlayerReady() {
-    this.myPlayer.readyToConnect = true;
-  }
+  // private handleChatMessageAdded(playerId: string, content: string) {
+  //   const otherPlayer = this.otherPlayerMap.get(playerId);
+  //   otherPlayer?.updateDialogBubble(content);
+  // }
+  // private handleMyPlayerReady() {
+  //   this.myPlayer.readyToConnect = true;
+  // }
 
-  private handleMyVideoConnected() {
-    this.myPlayer.videoConnected = true;
-  }
+  // private handleMyVideoConnected() {
+  //   this.myPlayer.videoConnected = true;
+  // }
 
   /**
    * Phaser update method called every frame.
    * Updates local player state and other players animations.
    */
-  update(time: number, delta: number) {
+  update() {
     if (this.myPlayer && this.client) {
       this.playerSelector.update(this.myPlayer, this.cursors);
       this.myPlayer.update(

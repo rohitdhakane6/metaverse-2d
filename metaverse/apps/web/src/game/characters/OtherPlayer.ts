@@ -90,7 +90,7 @@ export default class OtherPlayer extends Player {
     if (!animParts) return;
     const animState = animParts[1];
     if (animState === "sit") {
-      const animDir = animParts[2];
+      const animDir = animParts[2] as keyof typeof sittingShiftData;
       const sittingShift = sittingShiftData[animDir];
       if (sittingShift) {
         // set hardcoded depth (differs between directions) if player sits down

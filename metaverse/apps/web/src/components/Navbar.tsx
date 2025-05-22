@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ModeToggle } from "@components/mode-toggle";
+import { ModeToggle } from "@/components/mode-toggle";
 import { Menu, X } from "lucide-react";
 
 const Navbar = () => {

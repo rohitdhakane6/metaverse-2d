@@ -127,10 +127,6 @@ const Space = ({ userName, avatar }: SpaceProps) => {
     };
 
     roomClient.on(RoomEvents.StartAudio, onStartAudio);
-
-    return () => {
-      roomClient.off(RoomEvents.StartAudio, onStartAudio);
-    };
   }, [roomClient]);
 
   // Manage media producers based on redux state

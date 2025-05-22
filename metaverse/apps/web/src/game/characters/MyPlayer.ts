@@ -7,7 +7,6 @@ import Chair from "../items/Chair";
 import Computer from "../items/Computer";
 import Whiteboard from "../items/Whiteboard";
 
-import { phaserEvents, Event } from "../events/EventCenter";
 import { ItemType } from "../types/Items";
 import { NavKeys } from "../types/KeyboardState";
 import { GameClient } from "@/game/services/Network";

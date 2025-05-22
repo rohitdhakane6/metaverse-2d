@@ -7,7 +7,7 @@ type VerificationStep = "email" | "otp";
 
 function Register() {
   const [step, setStep] = useState<VerificationStep>("email");
-  const [email, setEmail] = useState("");
+  const [_email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   // In a real application, these would be API calls

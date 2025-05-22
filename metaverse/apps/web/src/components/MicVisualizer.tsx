@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 
 export default function MicVisualizer() {
   const [levels, setLevels] = useState<number>(0);
-    const [isPlaying, setIsPlaying] = useState(false);
 
   const track = useTypedSelector((state) => state.mediaDevices.tracks.microphone);
 

@@ -35,20 +35,15 @@ interface RoomClientConstructorParams {
 }
 
 export class SFURoomClient {
-  private name: string;
   private localMediaRef: React.RefObject<HTMLDivElement | null>;
   private remoteMediaRef: React.RefObject<HTMLDivElement | null>;
-  private remoteAudioRef: React.RefObject<HTMLElement | null>;
   private mediasoupClient;
 
   private socket: Socket;
   private producerTransport!: mediasoupTypes.Transport;
   private consumerTransport!: mediasoupTypes.Transport;
   private device!: mediasoupTypes.Device;
-  private roomId: string;
 
-  private isVideoOnFullScreen = false;
-  private isDevicesVisible = false;
 
   private consumers = new Map<string, mediasoupTypes.Consumer>();
   private producers = new Map<string, mediasoupTypes.Producer>();
@@ -60,21 +55,17 @@ export class SFURoomClient {
   constructor({
     localMediaRef,
     remoteMediaRef,
-    remoteAudioEl,
     mediasoupClient,
     socket,
     roomId,
     name,
     successCallback,
   }: RoomClientConstructorParams) {
-    this.name = name;
     this.localMediaRef = localMediaRef;
     this.remoteMediaRef = remoteMediaRef;
-    this.remoteAudioRef = remoteAudioEl;
     this.mediasoupClient = mediasoupClient;
 
     this.socket = socket;
-    this.roomId = roomId;
 
     // Initialize event listeners
     Object.values(RoomEvents).forEach((evt) => {
