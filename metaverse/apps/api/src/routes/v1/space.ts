@@ -152,31 +152,24 @@ spaceRouter.delete("/:spaceId", userMiddleware, async (req, res) => {
 });
 
 spaceRouter.get("/all", userMiddleware, async (req, res) => {
-  const spaces = await db.space.findMany({
-    where: { creatorId: req.userId },
-  });
+  try {
+    const userSpaces = await db.userSpace.findMany({
+      where: { userId: req.userId },
+      include: { space: true },
+    });
 
-  // const spaces = await db.userSpace.findMany({
-  //   where: { userId: req.userId },
-  //   include: { space: true },
-  // });
-  // res.json({
-  //   spaces: spaces.map((s) => ({
-  //     id: s.space.id,
-  //     name: s.space.name,
-  //     thumbnail: s.space.thumbnail,
-  //     dimensions: `${s.space.width}x${s.space.height}`,
-  //   })),
-  // });
+    const spaces = userSpaces.map((userSpace) => ({
+      id: userSpace.space.id,
+      name: userSpace.space.name,
+      thumbnail: userSpace.space.thumbnail,
+      dimensions: `${userSpace.space.width}x${userSpace.space.height}`,
+    }));
 
-  res.json({
-    spaces: spaces.map((s) => ({
-      id: s.id,
-      name: s.name,
-      thumbnail: s.thumbnail,
-      dimensions: `${s.width}x${s.height}`,
-    })),
-  });
+    res.json({ spaces });
+  } catch (error) {
+    console.error("Error fetching spaces:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 spaceRouter.post("/element", userMiddleware, async (req, res) => {
